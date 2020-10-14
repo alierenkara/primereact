@@ -1,100 +1,138 @@
-import React, { Component } from 'react';
-import { DataTable } from '../../components/datatable/DataTable';
-import { Column } from '../../components/column/Column';
-import ProductService from '../service/ProductService';
-import { Button } from '../../components/button/Button';
-import { Rating } from '../../components/rating/Rating';
-import { TabView, TabPanel } from '../../components/tabview/TabView';
-import { LiveEditor } from '../liveeditor/LiveEditor';
-import { AppInlineHeader } from '../../AppInlineHeader';
-import './DataTableDemo.scss';
+import React, { Component } from "react";
+import { DataTable } from "../../components/datatable/DataTable";
+import { Column } from "../../components/column/Column";
+import ProductService from "../service/ProductService";
+import { Button } from "../../components/button/Button";
+import { Rating } from "../../components/rating/Rating";
+import { TabView, TabPanel } from "../../components/tabview/TabView";
+import { LiveEditor } from "../liveeditor/LiveEditor";
+import { AppInlineHeader } from "../../AppInlineHeader";
+import "./DataTableDemo.scss";
 
 export class DataTableTemplatingDemo extends Component {
+  constructor(props) {
+    super(props);
 
-    constructor(props) {
-        super(props);
+    this.state = {
+      products: [],
+    };
 
-        this.state = {
-            products: []
-        };
+    this.productService = new ProductService();
+    this.imageBodyTemplate = this.imageBodyTemplate.bind(this);
+    this.priceBodyTemplate = this.priceBodyTemplate.bind(this);
+    this.ratingBodyTemplate = this.ratingBodyTemplate.bind(this);
+    this.statusBodyTemplate = this.statusBodyTemplate.bind(this);
+  }
 
-        this.productService = new ProductService();
-        this.imageBodyTemplate = this.imageBodyTemplate.bind(this);
-        this.priceBodyTemplate = this.priceBodyTemplate.bind(this);
-        this.ratingBodyTemplate = this.ratingBodyTemplate.bind(this);
-        this.statusBodyTemplate = this.statusBodyTemplate.bind(this);
-    }
+  componentDidMount() {
+    this.productService
+      .getProductsSmall()
+      .then((data) => this.setState({ products: data }));
+  }
 
-    componentDidMount() {
-        this.productService.getProductsSmall().then(data => this.setState({ products: data }));
-    }
+  formatCurrency(value) {
+    return value.toLocaleString("en-US", {
+      style: "currency",
+      currency: "USD",
+    });
+  }
 
-    formatCurrency(value) {
-        return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-    }
+  imageBodyTemplate(rowData) {
+    return (
+      <img
+        src={`showcase/demo/images/product/${rowData.image}`}
+        onError={(e) =>
+          (e.target.src =
+            "https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png")
+        }
+        alt={rowData.image}
+        className="product-image"
+      />
+    );
+  }
 
-    imageBodyTemplate(rowData) {
-        return <img src={`showcase/demo/images/product/${rowData.image}`} onError={(e) => e.target.src='https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png'} alt={rowData.image} className="product-image" />;
-    }
+  priceBodyTemplate(rowData) {
+    return this.formatCurrency(rowData.price);
+  }
 
-    priceBodyTemplate(rowData) {
-        return this.formatCurrency(rowData.price);
-    }
+  ratingBodyTemplate(rowData) {
+    return <Rating value={rowData.rating} readonly cancel={false} />;
+  }
 
-    ratingBodyTemplate(rowData) {
-        return <Rating value={rowData.rating} readonly cancel={false} />;
-    }
+  statusBodyTemplate(rowData) {
+    return (
+      <span
+        className={`product-badge status-${rowData.inventoryStatus.toLowerCase()}`}
+      >
+        {rowData.inventoryStatus}
+      </span>
+    );
+  }
 
-    statusBodyTemplate(rowData) {
-        return <span className={`product-badge status-${rowData.inventoryStatus.toLowerCase()}`}>{rowData.inventoryStatus}</span>;
-    }
+  render() {
+    const header = (
+      <div className="table-header">
+        Products
+        <Button icon="pi pi-refresh" />
+      </div>
+    );
+    const footer = `In total there are ${
+      this.state.products ? this.state.products.length : 0
+    } products.`;
 
-    render() {
-        const header = (
-            <div className="table-header">
-                Products
-                <Button icon="pi pi-refresh" />
-            </div>
-        );
-        const footer = `In total there are ${this.state.products ? this.state.products.length : 0} products.`;
+    return (
+      <div>
+        <div className="content-section introduction">
+          <AppInlineHeader changelogText="dataTable">
+            <h1>
+              DataTable <span>Templating</span>
+            </h1>
+            <p>
+              Custom content at header, body and footer sections are supported
+              via templating.
+            </p>
+          </AppInlineHeader>
+        </div>
 
-        return (
-            <div>
-                <div className="content-section introduction">
-                    <AppInlineHeader changelogText="dataTable">
-                        <h1>DataTable <span>Templating</span></h1>
-                        <p>Custom content at header, body and footer sections are supported via templating.</p>
-                    </AppInlineHeader>
-                </div>
+        <div className="content-section implementation datatable-templating-demo">
+          <div className="card">
+            <DataTable
+              value={this.state.products}
+              header={header}
+              footer={footer}
+            >
+              <Column field="name" header="Name"></Column>
+              <Column header="Image" body={this.imageBodyTemplate}></Column>
+              <Column
+                field="price"
+                header="Price"
+                body={this.priceBodyTemplate}
+              ></Column>
+              <Column field="category" header="Category"></Column>
+              <Column
+                field="rating"
+                header="Reviews"
+                body={this.ratingBodyTemplate}
+              ></Column>
+              <Column header="Status" body={this.statusBodyTemplate}></Column>
+            </DataTable>
+          </div>
+        </div>
 
-                <div className="content-section implementation datatable-templating-demo">
-                    <div className="card">
-                        <DataTable value={this.state.products} header={header} footer={footer}>
-                            <Column field="name" header="Name"></Column>
-                            <Column header="Image" body={this.imageBodyTemplate}></Column>
-                            <Column field="price" header="Price" body={this.priceBodyTemplate}></Column>
-                            <Column field="category" header="Category"></Column>
-                            <Column field="rating" header="Reviews" body={this.ratingBodyTemplate}></Column>
-                            <Column header="Status" body={this.statusBodyTemplate}></Column>
-                        </DataTable>
-                    </div>
-                </div>
-
-                <DataTableTemplatingDemoDoc></DataTableTemplatingDemoDoc>
-            </div>
-        );
-    }
+        <DataTableTemplatingDemoDoc></DataTableTemplatingDemoDoc>
+      </div>
+    );
+  }
 }
 
 export class DataTableTemplatingDemoDoc extends Component {
+  constructor(props) {
+    super(props);
 
-    constructor(props) {
-        super(props);
-
-        this.sources = {
-            'class': {
-                tabName: 'Class Source',
-                content: `
+    this.sources = {
+      class: {
+        tabName: "Class Source",
+        content: `
 import React, { Component } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
@@ -168,11 +206,11 @@ export class DataTableTemplatingDemo extends Component {
         );
     }
 }
-                `
-            },
-            'hooks': {
-                tabName: 'Hooks Source',
-                content: `
+                `,
+      },
+      hooks: {
+        tabName: "Hooks Source",
+        content: `
 import React, { useState, useEffect } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
@@ -232,11 +270,11 @@ const DataTableTemplatingDemo = () => {
         </div>
     );
 }
-                `
-            },
-            'ts': {
-                tabName: 'TS Source',
-                content: `
+                `,
+      },
+      ts: {
+        tabName: "TS Source",
+        content: `
 import React, { useState, useEffect } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
@@ -296,13 +334,13 @@ const DataTableTemplatingDemo = () => {
         </div>
     );
 }
-                `
-            }
-        };
+                `,
+      },
+    };
 
-        this.extFiles = {
-            'src/demo/DataTableDemo.css': {
-                content: `
+    this.extFiles = {
+      "src/demo/DataTableDemo.css": {
+        content: `
 .datatable-templating-demo .table-header {
     display: flex;
     align-items: center;
@@ -313,24 +351,30 @@ const DataTableTemplatingDemo = () => {
     width: 100px;
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
 }
-                `
-            }
-        }
-    }
+                `,
+      },
+    };
+  }
 
-    shouldComponentUpdate() {
-        return false;
-    }
+  shouldComponentUpdate() {
+    return false;
+  }
 
-    render() {
-        return (
-            <div className="content-section documentation">
-                <TabView>
-                    <TabPanel header="Source">
-                        <LiveEditor name="DataTableTemplatingDemo" sources={this.sources} service="ProductService" data="products-small" extFiles={this.extFiles} />
-                    </TabPanel>
-                </TabView>
-            </div>
-        )
-    }
+  render() {
+    return (
+      <div className="content-section documentation">
+        <TabView>
+          <TabPanel header="Source">
+            <LiveEditor
+              name="DataTableTemplatingDemo"
+              sources={this.sources}
+              service="ProductService"
+              data="products-small"
+              extFiles={this.extFiles}
+            />
+          </TabPanel>
+        </TabView>
+      </div>
+    );
+  }
 }

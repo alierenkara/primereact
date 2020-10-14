@@ -1,100 +1,138 @@
-import React, { Component } from 'react';
-import { DataTable } from '../../components/datatable/DataTable';
-import { Column } from '../../components/column/Column';
-import { ContextMenu } from '../../components/contextmenu/ContextMenu';
-import { Toast } from '../../components/toast/Toast';
-import ProductService from '../service/ProductService';
-import { TabView, TabPanel } from '../../components/tabview/TabView';
-import { LiveEditor } from '../liveeditor/LiveEditor';
-import { AppInlineHeader } from '../../AppInlineHeader';
+import React, { Component } from "react";
+import { DataTable } from "../../components/datatable/DataTable";
+import { Column } from "../../components/column/Column";
+import { ContextMenu } from "../../components/contextmenu/ContextMenu";
+import { Toast } from "../../components/toast/Toast";
+import ProductService from "../service/ProductService";
+import { TabView, TabPanel } from "../../components/tabview/TabView";
+import { LiveEditor } from "../liveeditor/LiveEditor";
+import { AppInlineHeader } from "../../AppInlineHeader";
 
 export class DataTableContextMenuDemo extends Component {
+  constructor(props) {
+    super(props);
 
-    constructor(props) {
-        super(props);
+    this.state = {
+      products: [],
+      selectedProduct: null,
+    };
 
-        this.state = {
-            products: [],
-            selectedProduct: null
-        };
+    this.menuModel = [
+      {
+        label: "View",
+        icon: "pi pi-fw pi-search",
+        command: () => this.viewProduct(this.state.selectedProduct),
+      },
+      {
+        label: "Delete",
+        icon: "pi pi-fw pi-times",
+        command: () => this.deleteProduct(this.state.selectedProduct),
+      },
+    ];
 
-        this.menuModel = [
-            {label: 'View', icon: 'pi pi-fw pi-search', command: () => this.viewProduct(this.state.selectedProduct)},
-            {label: 'Delete', icon: 'pi pi-fw pi-times', command: () => this.deleteProduct(this.state.selectedProduct)}
-        ];
+    this.productService = new ProductService();
+    this.viewProduct = this.viewProduct.bind(this);
+    this.deleteProduct = this.deleteProduct.bind(this);
+    this.priceBodyTemplate = this.priceBodyTemplate.bind(this);
+  }
 
-        this.productService = new ProductService();
-        this.viewProduct = this.viewProduct.bind(this);
-        this.deleteProduct = this.deleteProduct.bind(this);
-        this.priceBodyTemplate = this.priceBodyTemplate.bind(this);
-    }
+  componentDidMount() {
+    this.productService
+      .getProductsSmall()
+      .then((data) => this.setState({ products: data }));
+  }
 
-    componentDidMount() {
-        this.productService.getProductsSmall().then(data => this.setState({ products: data }));
-    }
+  viewProduct(product) {
+    this.toast.show({
+      severity: "info",
+      summary: "Product Selected",
+      detail: product.name,
+    });
+  }
 
-    viewProduct(product) {
-        this.toast.show({severity: 'info', summary: 'Product Selected', detail: product.name});
-    }
+  deleteProduct(product) {
+    let products = [...this.state.products];
+    products = products.filter((p) => p.id !== product.id);
 
-    deleteProduct(product) {
-        let products = [...this.state.products];
-        products = products.filter((p) => p.id !== product.id);
+    this.toast.show({
+      severity: "info",
+      summary: "Product Deleted",
+      detail: product.name,
+    });
+    this.setState({ products });
+  }
 
-        this.toast.show({severity: 'info', summary: 'Product Deleted', detail: product.name});
-        this.setState({ products });
-    }
+  formatCurrency(value) {
+    return value.toLocaleString("en-US", {
+      style: "currency",
+      currency: "USD",
+    });
+  }
 
-    formatCurrency(value) {
-        return value.toLocaleString('en-US', {style: 'currency', currency: 'USD'});
-    }
+  priceBodyTemplate(rowData) {
+    return this.formatCurrency(rowData.price);
+  }
 
-    priceBodyTemplate(rowData) {
-        return this.formatCurrency(rowData.price);
-    }
+  render() {
+    return (
+      <div>
+        <div className="content-section introduction">
+          <AppInlineHeader changelogText="dataTable">
+            <h1>
+              DataTable <span>ContextMenu</span>
+            </h1>
+            <p>DataTable has exclusive integration with ContextMenu.</p>
+          </AppInlineHeader>
+        </div>
 
-    render() {
-        return (
-            <div>
-                <div className="content-section introduction">
-                    <AppInlineHeader changelogText="dataTable">
-                        <h1>DataTable <span>ContextMenu</span></h1>
-                        <p>DataTable has exclusive integration with ContextMenu.</p>
-                    </AppInlineHeader>
-                </div>
+        <div className="content-section implementation">
+          <Toast
+            ref={(el) => {
+              this.toast = el;
+            }}
+          ></Toast>
 
-                <div className="content-section implementation">
-                    <Toast ref={(el) => { this.toast = el; }}></Toast>
+          <ContextMenu
+            model={this.menuModel}
+            ref={(el) => (this.cm = el)}
+            onHide={() => this.setState({ selectedProduct: null })}
+          />
 
-                    <ContextMenu model={this.menuModel} ref={el => this.cm = el} onHide={() => this.setState({ selectedProduct: null })}/>
+          <div className="card">
+            <DataTable
+              value={this.state.products}
+              contextMenuSelection={this.state.selectedProduct}
+              onContextMenuSelectionChange={(e) =>
+                this.setState({ selectedProduct: e.value })
+              }
+              onContextMenu={(e) => this.cm.show(e.originalEvent)}
+            >
+              <Column field="code" header="Code"></Column>
+              <Column field="name" header="Name"></Column>
+              <Column field="category" header="Category"></Column>
+              <Column
+                field="price"
+                header="Price"
+                body={this.priceBodyTemplate}
+              />
+            </DataTable>
+          </div>
+        </div>
 
-                    <div className="card">
-                        <DataTable value={this.state.products} contextMenuSelection={this.state.selectedProduct}
-                            onContextMenuSelectionChange={e => this.setState({ selectedProduct: e.value })}
-                            onContextMenu={e => this.cm.show(e.originalEvent)}>
-                            <Column field="code" header="Code"></Column>
-                            <Column field="name" header="Name"></Column>
-                            <Column field="category" header="Category"></Column>
-                            <Column field="price" header="Price" body={this.priceBodyTemplate} />
-                        </DataTable>
-                    </div>
-                </div>
-
-                <DataTableContextMenuDemoDoc></DataTableContextMenuDemoDoc>
-            </div>
-        );
-    }
+        <DataTableContextMenuDemoDoc></DataTableContextMenuDemoDoc>
+      </div>
+    );
+  }
 }
 
 export class DataTableContextMenuDemoDoc extends Component {
+  constructor(props) {
+    super(props);
 
-    constructor(props) {
-        super(props);
-
-        this.sources = {
-            'class': {
-                tabName: 'Class Source',
-                content: `
+    this.sources = {
+      class: {
+        tabName: "Class Source",
+        content: `
 import React, { Component } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
@@ -168,11 +206,11 @@ export class DataTableContextMenuDemo extends Component {
         );
     }
 }
-                `
-            },
-            'hooks': {
-                tabName: 'Hooks Source',
-                content: `
+                `,
+      },
+      hooks: {
+        tabName: "Hooks Source",
+        content: `
 import React, { useState, useEffect, useRef } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
@@ -234,11 +272,11 @@ const DataTableContextMenuDemo = () => {
         </div>
     );
 }
-                `
-            },
-            'ts': {
-                tabName: 'TS Source',
-                content: `
+                `,
+      },
+      ts: {
+        tabName: "TS Source",
+        content: `
 import React, { useState, useEffect, useRef } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
@@ -300,24 +338,29 @@ const DataTableContextMenuDemo = () => {
         </div>
     );
 }
-                `
-            }
-        }
-    }
+                `,
+      },
+    };
+  }
 
-    shouldComponentUpdate() {
-        return false;
-    }
+  shouldComponentUpdate() {
+    return false;
+  }
 
-    render() {
-        return (
-            <div className="content-section documentation">
-                <TabView>
-                    <TabPanel header="Source">
-                        <LiveEditor name="DataTableContextMenuDemo" sources={this.sources} service="ProductService" data="products-small" />
-                    </TabPanel>
-                </TabView>
-            </div>
-        )
-    }
+  render() {
+    return (
+      <div className="content-section documentation">
+        <TabView>
+          <TabPanel header="Source">
+            <LiveEditor
+              name="DataTableContextMenuDemo"
+              sources={this.sources}
+              service="ProductService"
+              data="products-small"
+            />
+          </TabPanel>
+        </TabView>
+      </div>
+    );
+  }
 }

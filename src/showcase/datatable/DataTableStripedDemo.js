@@ -1,63 +1,70 @@
-import React, { Component } from 'react';
-import { DataTable } from '../../components/datatable/DataTable';
-import { Column } from '../../components/column/Column';
-import ProductService from '../service/ProductService';
-import { AppInlineHeader } from '../../AppInlineHeader';
-import { TabView, TabPanel } from '../../components/tabview/TabView';
-import { LiveEditor } from '../liveeditor/LiveEditor';
+import React, { Component } from "react";
+import { DataTable } from "../../components/datatable/DataTable";
+import { Column } from "../../components/column/Column";
+import ProductService from "../service/ProductService";
+import { AppInlineHeader } from "../../AppInlineHeader";
+import { TabView, TabPanel } from "../../components/tabview/TabView";
+import { LiveEditor } from "../liveeditor/LiveEditor";
 
 export class DataTableStripedDemo extends Component {
+  constructor(props) {
+    super(props);
 
-    constructor(props) {
-        super(props);
+    this.state = {
+      products: null,
+    };
 
-        this.state = {
-            products: null
-        };
+    this.productService = new ProductService();
+  }
 
-        this.productService = new ProductService();
-    }
+  componentDidMount() {
+    this.productService
+      .getProductsSmall()
+      .then((data) => this.setState({ products: data }));
+  }
 
-    componentDidMount() {
-        this.productService.getProductsSmall().then(data => this.setState({ products: data }));
-    }
+  render() {
+    return (
+      <div>
+        <div className="content-section introduction">
+          <AppInlineHeader changelogText="dataTable">
+            <h1>
+              DataTable <span>Striped Rows</span>
+            </h1>
+            <p>
+              Adding <i>p-datatable-striped</i> displays striped rows.
+            </p>
+          </AppInlineHeader>
+        </div>
 
-    render() {
-        return (
-            <div>
-                <div className="content-section introduction">
-                    <AppInlineHeader changelogText="dataTable">
-                        <h1>DataTable <span>Striped Rows</span></h1>
-                        <p>Adding <i>p-datatable-striped</i> displays striped rows.</p>
-                    </AppInlineHeader>
-                </div>
+        <div className="content-section implementation">
+          <div className="card">
+            <DataTable
+              value={this.state.products}
+              className="p-datatable-striped"
+            >
+              <Column field="code" header="Code"></Column>
+              <Column field="name" header="Name"></Column>
+              <Column field="category" header="Category"></Column>
+              <Column field="quantity" header="Quantity"></Column>
+            </DataTable>
+          </div>
+        </div>
 
-                <div className="content-section implementation">
-                    <div className="card">
-                        <DataTable value={this.state.products} className="p-datatable-striped">
-                            <Column field="code" header="Code"></Column>
-                            <Column field="name" header="Name"></Column>
-                            <Column field="category" header="Category"></Column>
-                            <Column field="quantity" header="Quantity"></Column>
-                        </DataTable>
-                    </div>
-                </div>
-
-                <DataTableStripedDemoDoc />
-            </div>
-        );
-    }
+        <DataTableStripedDemoDoc />
+      </div>
+    );
+  }
 }
 
 export class DataTableStripedDemoDoc extends Component {
+  constructor(props) {
+    super(props);
 
-    constructor(props) {
-        super(props);
-
-        this.sources = {
-            'class': {
-                tabName: 'Class Source',
-                content: `
+    this.sources = {
+      class: {
+        tabName: "Class Source",
+        content: `
 import React, { Component } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
@@ -94,11 +101,11 @@ export class DataTableStripedDemo extends Component {
         );
     }
 }
-                `
-            },
-            'hooks': {
-                tabName: 'Hooks Source',
-                content: `
+                `,
+      },
+      hooks: {
+        tabName: "Hooks Source",
+        content: `
 import React, { useState, useEffect } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
@@ -125,11 +132,11 @@ const DataTableStripedDemo = () => {
         </div>
     );
 }
-                `
-            },
-            'ts': {
-                tabName: 'TS Source',
-                content: `
+                `,
+      },
+      ts: {
+        tabName: "TS Source",
+        content: `
 import React, { useState, useEffect } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
@@ -156,24 +163,29 @@ const DataTableStripedDemo = () => {
         </div>
     );
 }
-                `
-            }
-        }
-    }
+                `,
+      },
+    };
+  }
 
-    shouldComponentUpdate() {
-        return false;
-    }
+  shouldComponentUpdate() {
+    return false;
+  }
 
-    render() {
-        return (
-            <div className="content-section documentation">
-                <TabView>
-                    <TabPanel header="Source">
-                        <LiveEditor name="DataTableStripedDemo" sources={this.sources} service="ProductService" data="products-small" />
-                    </TabPanel>
-                </TabView>
-            </div>
-        )
-    }
+  render() {
+    return (
+      <div className="content-section documentation">
+        <TabView>
+          <TabPanel header="Source">
+            <LiveEditor
+              name="DataTableStripedDemo"
+              sources={this.sources}
+              service="ProductService"
+              data="products-small"
+            />
+          </TabPanel>
+        </TabView>
+      </div>
+    );
+  }
 }

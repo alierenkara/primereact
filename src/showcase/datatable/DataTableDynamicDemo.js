@@ -1,71 +1,71 @@
-import React, { Component } from 'react';
-import { DataTable } from '../../components/datatable/DataTable';
-import { Column } from '../../components/column/Column';
-import ProductService from '../service/ProductService';
-import { TabView, TabPanel } from '../../components/tabview/TabView';
-import { LiveEditor } from '../liveeditor/LiveEditor';
-import { AppInlineHeader } from '../../AppInlineHeader';
+import React, { Component } from "react";
+import { DataTable } from "../../components/datatable/DataTable";
+import { Column } from "../../components/column/Column";
+import ProductService from "../service/ProductService";
+import { TabView, TabPanel } from "../../components/tabview/TabView";
+import { LiveEditor } from "../liveeditor/LiveEditor";
+import { AppInlineHeader } from "../../AppInlineHeader";
 
 export class DataTableDynamicDemo extends Component {
+  constructor(props) {
+    super(props);
 
-    constructor(props) {
-        super(props);
+    this.state = {
+      products: [],
+    };
 
-        this.state = {
-            products: []
-        };
+    this.columns = [
+      { field: "code", header: "Code" },
+      { field: "name", header: "Name" },
+      { field: "category", header: "Category" },
+      { field: "quantity", header: "Quantity" },
+    ];
 
-        this.columns = [
-            {field: 'code', header: 'Code'},
-            {field: 'name', header: 'Name'},
-            {field: 'category', header: 'Category'},
-            {field: 'quantity', header: 'Quantity'}
-        ];
+    this.productService = new ProductService();
+  }
 
-        this.productService = new ProductService();
-    }
+  componentDidMount() {
+    this.productService
+      .getProductsSmall()
+      .then((data) => this.setState({ products: data }));
+  }
 
-    componentDidMount() {
-        this.productService.getProductsSmall().then(data => this.setState({ products: data }));
-    }
+  render() {
+    const dynamicColumns = this.columns.map((col, i) => {
+      return <Column key={col.field} field={col.field} header={col.header} />;
+    });
 
-    render() {
-        const dynamicColumns = this.columns.map((col,i) => {
-            return <Column key={col.field} field={col.field} header={col.header} />;
-        });
+    return (
+      <div>
+        <div className="content-section introduction">
+          <AppInlineHeader changelogText="dataTable">
+            <h1>
+              DataTable <span>Dynamic Columns</span>
+            </h1>
+            <p>Columns can be defined dynamically.</p>
+          </AppInlineHeader>
+        </div>
 
-        return (
-            <div>
-                <div className="content-section introduction">
-                    <AppInlineHeader changelogText="dataTable">
-                        <h1>DataTable <span>Dynamic Columns</span></h1>
-                        <p>Columns can be defined dynamically.</p>
-                    </AppInlineHeader>
-                </div>
+        <div className="content-section implementation">
+          <div className="card">
+            <DataTable value={this.state.products}>{dynamicColumns}</DataTable>
+          </div>
+        </div>
 
-                <div className="content-section implementation">
-                    <div className="card">
-                        <DataTable value={this.state.products}>
-                            {dynamicColumns}
-                        </DataTable>
-                    </div>
-                </div>
-
-                <DataTableDynamicDemoDoc></DataTableDynamicDemoDoc>
-            </div>
-        );
-    }
+        <DataTableDynamicDemoDoc></DataTableDynamicDemoDoc>
+      </div>
+    );
+  }
 }
 
 export class DataTableDynamicDemoDoc extends Component {
+  constructor(props) {
+    super(props);
 
-    constructor(props) {
-        super(props);
-
-        this.sources = {
-            'class': {
-                tabName: 'Class Source',
-                content: `
+    this.sources = {
+      class: {
+        tabName: "Class Source",
+        content: `
 import React, { Component } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
@@ -110,11 +110,11 @@ export class DataTableDynamicDemo extends Component {
         );
     }
 }
-                `
-            },
-            'hooks': {
-                tabName: 'Hooks Source',
-                content: `
+                `,
+      },
+      hooks: {
+        tabName: "Hooks Source",
+        content: `
 import React, { useState, useEffect } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
@@ -149,11 +149,11 @@ const DataTableDynamicDemo = () => {
         </div>
     );
 }
-                `
-            },
-            'ts': {
-                tabName: 'TS Source',
-                content: `
+                `,
+      },
+      ts: {
+        tabName: "TS Source",
+        content: `
 import React, { useState, useEffect } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
@@ -188,24 +188,29 @@ const DataTableDynamicDemo = () => {
         </div>
     );
 }
-                `
-            }
-        }
-    }
+                `,
+      },
+    };
+  }
 
-    shouldComponentUpdate() {
-        return false;
-    }
+  shouldComponentUpdate() {
+    return false;
+  }
 
-    render() {
-        return (
-            <div className="content-section documentation">
-                <TabView>
-                    <TabPanel header="Source">
-                        <LiveEditor name="DataTableDynamicDemo" sources={this.sources} service="ProductService" data="products-small" />
-                    </TabPanel>
-                </TabView>
-            </div>
-        )
-    }
+  render() {
+    return (
+      <div className="content-section documentation">
+        <TabView>
+          <TabPanel header="Source">
+            <LiveEditor
+              name="DataTableDynamicDemo"
+              sources={this.sources}
+              service="ProductService"
+              data="products-small"
+            />
+          </TabPanel>
+        </TabView>
+      </div>
+    );
+  }
 }
