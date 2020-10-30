@@ -19,7 +19,7 @@ export class DataTableReorderDemo extends Component {
       { field: "code", header: "Code" },
       { field: "name", header: "Name" },
       { field: "category", header: "Category" },
-      { field: "quantity", header: "Quantity" },
+      { field: "quantity", header: "Quantity", sortable: true },
     ];
 
     this.productService = new ProductService();
@@ -59,6 +59,7 @@ export class DataTableReorderDemo extends Component {
           columnKey={col.field}
           field={col.field}
           header={col.header}
+          sortable={col.sortable}
         />
       );
     });
@@ -83,6 +84,17 @@ export class DataTableReorderDemo extends Component {
             }}
           ></Toast>
 
+          <div className="card">
+            <DataTable
+              value={this.state.products}
+              reorderableColumns
+              onRowReorder={this.onRowReorder}
+              onColReorder={this.onColReorder}
+            >
+              <Column rowReorder style={{ width: "3em" }} />
+              {dynamicColumns}
+            </DataTable>
+          </div>
           <div className="card">
             <DataTable
               value={this.state.products}

@@ -823,6 +823,7 @@ export class DataTable extends Component {
     return hasFooter;
   }
 
+  ////////////////////////////////////////////////////////////////////////////
   onColumnResizeStart(event) {
     let containerLeft = DomHandler.getOffset(this.container).left;
     this.resizeColumn = event.columnEl;
@@ -833,7 +834,9 @@ export class DataTable extends Component {
 
     this.bindColumnResizeEvents();
   }
+  ////////////////////////////////////////////////////////////////////////////
 
+  ////////////////////////////////////////////////////////////////////////////
   onColumnResize(event) {
     let containerLeft = DomHandler.getOffset(this.container).left;
     DomHandler.addClass(this.container, "p-unselectable-text");
@@ -844,8 +847,12 @@ export class DataTable extends Component {
 
     this.resizerHelper.style.display = "block";
   }
+  ////////////////////////////////////////////////////////////////////////////
 
+  ////////////////////////////////////////////////////////////////////////////
   onColumnResizeEnd(event) {
+    debugger;
+
     let delta = this.resizerHelper.offsetLeft - this.lastResizerHelperX;
     let columnWidth = this.resizeColumn.offsetWidth;
     let newColumnWidth = columnWidth + delta;
@@ -933,6 +940,7 @@ export class DataTable extends Component {
 
     this.unbindColumnResizeEvents();
   }
+  ////////////////////////////////////////////////////////////////////////////
 
   setScrollableItemsWidthOnExpandResize(column, newColumnWidth, delta) {
     let scrollableView = column
@@ -1040,6 +1048,7 @@ export class DataTable extends Component {
     }
   }
 
+  //////////////////////////////////////////////////////////////////////////////
   resizeColGroup(table, resizeColumnIndex, newColumnWidth, nextColumnWidth) {
     if (table) {
       let colGroup =
@@ -1060,7 +1069,9 @@ export class DataTable extends Component {
       }
     }
   }
+  //////////////////////////////////////////////////////////////////////////////
 
+  //////////////////////////////////////////////////////////////////////////////
   bindColumnResizeEvents() {
     this.documentColumnResizeListener = document.addEventListener(
       "mousemove",
@@ -1081,7 +1092,9 @@ export class DataTable extends Component {
       }
     );
   }
+  //////////////////////////////////////////////////////////////////////////////
 
+  //////////////////////////////////////////////////////////////////////////////
   unbindColumnResizeEvents() {
     document.removeEventListener("document", this.documentColumnResizeListener);
     document.removeEventListener(
@@ -1089,6 +1102,7 @@ export class DataTable extends Component {
       this.documentColumnResizeEndListener
     );
   }
+  //////////////////////////////////////////////////////////////////////////////
 
   findParentHeader(element) {
     if (element.nodeName === "TH") {
@@ -1126,7 +1140,6 @@ export class DataTable extends Component {
       event.preventDefault();
       let containerOffset = DomHandler.getOffset(this.container);
       let dropHeaderOffset = DomHandler.getOffset(dropHeader);
-
       if (this.draggedColumn !== dropHeader) {
         let targetLeft = dropHeaderOffset.left - containerOffset.left;
         //let targetTop =  containerOffset.top - dropHeaderOffset.top;
@@ -1621,7 +1634,6 @@ export class DataTable extends Component {
 
   getColumns() {
     let columns = React.Children.toArray(this.props.children);
-
     if (columns && columns.length) {
       if (this.props.reorderableColumns && this.state.columnOrder) {
         let orderedColumns = [];
@@ -1757,6 +1769,8 @@ export class DataTable extends Component {
     let footerFacet = this.props.footer && (
       <div className="p-datatable-footer">{this.props.footer}</div>
     );
+
+    /////////////////////////////////////////////////////////////////
     let resizeHelper = this.props.resizableColumns && (
       <div
         ref={(el) => {
@@ -1766,6 +1780,8 @@ export class DataTable extends Component {
         style={{ display: "none" }}
       ></div>
     );
+    /////////////////////////////////////////////////////////////////
+
     let tableContent = null;
     let resizeIndicatorUp = this.props.reorderableColumns && (
       <span

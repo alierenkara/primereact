@@ -64,6 +64,7 @@ export class HeaderCell extends Component {
     this.setState({ filterValue });
   }
 
+  ///////////////////////////////////////////////////////////////////////
   onResizerMouseDown(event) {
     if (this.props.resizableColumns && this.props.onColumnResizeStart) {
       this.props.onColumnResizeStart({
@@ -75,6 +76,7 @@ export class HeaderCell extends Component {
       event.preventDefault();
     }
   }
+  ///////////////////////////////////////////////////////////////////////
 
   onMouseDown(event) {
     if (this.props.reorderableColumns && this.props.columnProps.reorderable) {
@@ -226,12 +228,15 @@ export class HeaderCell extends Component {
           : false;
       let multipleSorted = multiSortMetaData !== null;
       let sortOrder = 0;
+
+      /////////////////////////////////////////////////
       let resizer = this.props.resizableColumns && (
         <span
           className="p-column-resizer p-clickable"
           onMouseDown={this.onResizerMouseDown}
         ></span>
       );
+      /////////////////////////////////////////////////
 
       if (singleSorted) sortOrder = this.props.sortOrder;
       else if (multipleSorted) sortOrder = multiSortMetaData.order;
